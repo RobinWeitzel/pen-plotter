@@ -131,6 +131,30 @@ export class UI {
     $('btnPause').onclick = () => this.ble.pause();
     $('btnResume').onclick = () => this.ble.resume();
     $('btnStop').onclick = () => this.ble.stop();
+
+    const send = (cmd) => this._sendCommand(cmd);
+    $('btnHome').onclick = () => send('$H');
+    $('btnUnlock').onclick = () => send('$X');
+    $('btnZero').onclick = () => send('G10 P0 L20 X0 Y0 Z0');
+    $('btnGoZero').onclick = () => send('G90 G0 X0 Y0');
+    $('btnState').onclick = () => {
+      this.log('> ?');
+      this.ble.sendRealtime(0x3f).catch((err) => this.log('Send failed: ' + err.message));
+    };
+    $('btnCustomSend').onclick = () => {
+      const v = $('customCmd').value;
+      if (!v.trim()) return;
+      send(v);
+      $('customCmd').value = '';
+    };
+    $('customCmd').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('btnCustomSend').click();
+    });
+  }
+
+  _sendCommand(cmd) {
+    this.log('> ' + cmd);
+    this.ble.sendCommand(cmd).catch((err) => this.log('Send failed: ' + err.message));
   }
 
   _wireBleEvents() {
@@ -140,6 +164,9 @@ export class UI {
       $('btnConnect').disabled = true;
       $('btnDisconnect').disabled = false;
       if (this.gcodeLines.length) $('btnSend').disabled = false;
+      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend']) {
+        $(id).disabled = false;
+      }
     });
     this.ble.addEventListener('disconnected', () => {
       $('connState').textContent = 'Disconnected';
@@ -150,6 +177,9 @@ export class UI {
       $('btnPause').disabled = true;
       $('btnResume').disabled = true;
       $('btnStop').disabled = true;
+      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend']) {
+        $(id).disabled = true;
+      }
     });
     this.ble.addEventListener('status', (e) => {
       const s = e.detail;

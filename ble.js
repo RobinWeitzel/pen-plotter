@@ -109,6 +109,28 @@ export class BleGrbl extends EventTarget {
     await this._writeRaw(new Uint8Array([byte]));
   }
 
+  // Send a single line (e.g. $H, $X, G0 X0 Y0). Enqueues into the same
+  // character-counting flow so it interleaves safely with a running job.
+  async sendCommand(line) {
+    if (!this.connected) throw new Error('Not connected');
+    const clean = String(line).replace(/\r?\n/g, '').trim();
+    if (!clean) return;
+    this.queue.push(clean);
+    this.totalLines++;
+    this.dispatchEvent(new CustomEvent('progress', {
+      detail: { sent: this.sentLines, acked: this.acked, total: this.totalLines },
+    }));
+    if (!this.running) {
+      this.running = true;
+      if (!this.statusTimer) {
+        this.statusTimer = setInterval(() => {
+          this.sendRealtime(0x3f /* '?' */).catch(() => {});
+        }, STATUS_POLL_MS);
+      }
+    }
+    this._pump();
+  }
+
   // ---- notifications -------------------------------------------------------
 
   _onNotify(e) {
