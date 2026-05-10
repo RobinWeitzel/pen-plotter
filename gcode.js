@@ -109,29 +109,26 @@ function binarize(imageData, threshold) {
 // Layout: scale + center polylines into the paper's drawable area.
 
 export function layoutPolylines(polys, srcBounds, opts) {
-  // opts: { paperW, paperH, margin, fit:'fit'|'explicit', outW, outH }
+  // opts: { paperW, paperH, margin, fit:'fit'|'explicit', outW, outH, align:'tl'|'center' }
   if (!polys.length || !srcBounds) return [];
   const drawW = opts.paperW - 2 * opts.margin;
   const drawH = opts.paperH - 2 * opts.margin;
 
-  let scale, offX, offY;
+  let scale;
   if (opts.fit === 'explicit') {
-    const sx = opts.outW / srcBounds.width;
-    const sy = opts.outH / srcBounds.height;
-    scale = Math.min(sx, sy);
-    const w = srcBounds.width * scale;
-    const h = srcBounds.height * scale;
-    offX = opts.margin + (drawW - w) / 2;
-    offY = opts.margin + (drawH - h) / 2;
+    scale = Math.min(opts.outW / srcBounds.width, opts.outH / srcBounds.height);
   } else {
-    const sx = drawW / srcBounds.width;
-    const sy = drawH / srcBounds.height;
-    scale = Math.min(sx, sy);
-    const w = srcBounds.width * scale;
-    const h = srcBounds.height * scale;
-    offX = opts.margin + (drawW - w) / 2;
-    offY = opts.margin + (drawH - h) / 2;
+    scale = Math.min(drawW / srcBounds.width, drawH / srcBounds.height);
   }
+  const w = srcBounds.width * scale;
+  const h = srcBounds.height * scale;
+
+  // offX is in paper-X (left edge). offY is in pre-flip SVG-y space — the
+  // smaller it is, the higher the design sits on the paper (Y is flipped on
+  // emit). So top-left alignment uses the smallest offX and offY = margin.
+  const align = opts.align ?? 'tl';
+  const offX = align === 'center' ? opts.margin + (drawW - w) / 2 : opts.margin;
+  const offY = align === 'center' ? opts.margin + (drawH - h) / 2 : opts.margin;
 
   // Paper.js gives y-down. Flip to plotter convention (y-up).
   return polys.map(poly => poly.map(([x, y]) => {

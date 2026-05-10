@@ -58,6 +58,7 @@ export class UI {
       penUp: $('penUp').value.trim(),
       penDown: $('penDown').value.trim(),
       origin: $('origin').value,
+      align: $('align').value,
       threshold: +$('trThresh').value,
       smoothing: +$('trSmooth').value,
       minPathLength: +$('minPath').value,
