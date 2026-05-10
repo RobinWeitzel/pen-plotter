@@ -10,6 +10,7 @@ import {
   reorderPolylines,
   emitGcode,
   filterShortPolylines,
+  applyOrigin,
 } from './gcode.js';
 
 const $ = (id) => document.getElementById(id);
@@ -56,6 +57,7 @@ export class UI {
       tolerance: +$('tolerance').value,
       penUp: $('penUp').value.trim(),
       penDown: $('penDown').value.trim(),
+      origin: $('origin').value,
       threshold: +$('trThresh').value,
       smoothing: +$('trSmooth').value,
       minPathLength: +$('minPath').value,
@@ -259,7 +261,8 @@ export class UI {
     laid = reorderPolylines(laid);
     this.polylines = laid;
 
-    const gcode = emitGcode(laid, opts);
+    const machinePolys = applyOrigin(laid, opts.origin, opts.paperW, opts.paperH);
+    const gcode = emitGcode(machinePolys, opts);
     this.gcodeLines = gcode.split('\n').filter(l => l.length);
 
     $('gcodeOut').value = gcode;

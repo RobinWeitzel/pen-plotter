@@ -141,6 +141,18 @@ export function layoutPolylines(polys, srcBounds, opts) {
   }));
 }
 
+// Remap paper-coords (origin bottom-left, Y up) into plotter machine-coords
+// based on which corner the user parked zero at.
+export function applyOrigin(polys, origin, paperW, paperH) {
+  if (!origin || origin === 'bl') return polys;
+  const flipX = origin === 'br' || origin === 'tr';
+  const flipY = origin === 'tl' || origin === 'tr';
+  return polys.map(poly => poly.map(([x, y]) => [
+    flipX ? paperW - x : x,
+    flipY ? paperH - y : y,
+  ]));
+}
+
 // ----------------------------------------------------------------------------
 // Greedy nearest-neighbor reorder. Allows reversing a polyline if its end is
 // closer than its start.
