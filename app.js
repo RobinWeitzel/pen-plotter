@@ -4,7 +4,7 @@ import { BleGrbl } from './ble.js';
 import { UI } from './ui.js';
 
 // Bump together with CACHE_VERSION in service-worker.js on each release.
-export const APP_VERSION = 'v0.6';
+export const APP_VERSION = 'v0.7';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
