@@ -2,7 +2,7 @@
 //
 // Bump CACHE_VERSION when you ship changes; old caches are cleaned on activate.
 
-const CACHE_VERSION = 'pen-plotter-v3';
+const CACHE_VERSION = 'pen-plotter-v4';
 const APP_SHELL = [
   './',
   './index.html',

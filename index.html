@@ -117,6 +117,31 @@
     </section>
 
     <details>
+      <summary>Jog</summary>
+      <div class="jog">
+        <div class="jog-pad">
+          <button id="jogYp" class="jog-btn" disabled aria-label="Y+">▲</button>
+          <button id="jogXm" class="jog-btn" disabled aria-label="X-">◀</button>
+          <button id="jogXp" class="jog-btn" disabled aria-label="X+">▶</button>
+          <button id="jogYm" class="jog-btn" disabled aria-label="Y-">▼</button>
+        </div>
+        <div class="jog-side">
+          <div class="seg" role="group" aria-label="Step size">
+            <button data-step="0.1">0.1</button>
+            <button data-step="1" class="on">1</button>
+            <button data-step="10">10</button>
+            <button data-step="50">50</button>
+          </div>
+          <span class="hint">Step (mm)</span>
+          <div class="row">
+            <button id="penUpBtn" disabled>Pen up</button>
+            <button id="penDownBtn" disabled>Pen down</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details>
       <summary>Console</summary>
       <div class="row">
         <button id="btnHome" disabled title="$H">Home</button>

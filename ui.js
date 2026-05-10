@@ -150,6 +150,31 @@ export class UI {
     $('customCmd').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') $('btnCustomSend').click();
     });
+
+    // Jog: directional pad uses Grbl jog command ($J=) with current feed rate.
+    this.jogStep = 1;
+    document.querySelectorAll('.seg button[data-step]').forEach((b) => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.seg button[data-step]').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        this.jogStep = parseFloat(b.dataset.step);
+      });
+    });
+    const jog = (dx, dy) => {
+      const s = this.jogStep;
+      const feed = +$('feed').value || 1500;
+      const parts = [];
+      if (dx) parts.push(`X${(dx * s).toFixed(3)}`);
+      if (dy) parts.push(`Y${(dy * s).toFixed(3)}`);
+      this._sendCommand(`$J=G91 G21 ${parts.join(' ')} F${feed}`);
+    };
+    $('jogXp').onclick = () => jog(+1, 0);
+    $('jogXm').onclick = () => jog(-1, 0);
+    $('jogYp').onclick = () => jog(0, +1);
+    $('jogYm').onclick = () => jog(0, -1);
+
+    $('penUpBtn').onclick = () => this._sendCommand($('penUp').value.trim());
+    $('penDownBtn').onclick = () => this._sendCommand($('penDown').value.trim());
   }
 
   _sendCommand(cmd) {
@@ -164,7 +189,7 @@ export class UI {
       $('btnConnect').disabled = true;
       $('btnDisconnect').disabled = false;
       if (this.gcodeLines.length) $('btnSend').disabled = false;
-      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend']) {
+      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend','jogXp','jogXm','jogYp','jogYm','penUpBtn','penDownBtn']) {
         $(id).disabled = false;
       }
     });
@@ -177,7 +202,7 @@ export class UI {
       $('btnPause').disabled = true;
       $('btnResume').disabled = true;
       $('btnStop').disabled = true;
-      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend']) {
+      for (const id of ['btnHome','btnUnlock','btnZero','btnGoZero','btnState','btnCustomSend','jogXp','jogXm','jogYp','jogYm','penUpBtn','penDownBtn']) {
         $(id).disabled = true;
       }
     });
