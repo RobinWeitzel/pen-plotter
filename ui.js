@@ -170,8 +170,8 @@ export class UI {
     };
     $('jogXp').onclick = () => jog(+1, 0);
     $('jogXm').onclick = () => jog(-1, 0);
-    $('jogYp').onclick = () => jog(0, +1);
-    $('jogYm').onclick = () => jog(0, -1);
+    $('jogYp').onclick = () => jog(0, -1);
+    $('jogYm').onclick = () => jog(0, +1);
 
     $('penUpBtn').onclick = () => this._sendCommand($('penUp').value.trim());
     $('penDownBtn').onclick = () => this._sendCommand($('penDown').value.trim());

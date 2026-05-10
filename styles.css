@@ -406,8 +406,9 @@ details > .row {
   font-size: 0.9rem;
   border-radius: 7px;
 }
-.seg button:hover:not(:disabled) { background: transparent; color: var(--fg); }
-.seg button.on {
+.seg button:hover:not(:disabled):not(.on) { background: transparent; color: var(--fg); }
+.seg button.on,
+.seg button.on:hover {
   background: var(--accent-soft);
   color: var(--accent);
   font-weight: 600;
