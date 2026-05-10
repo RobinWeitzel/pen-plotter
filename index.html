@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <title>Pen Plotter</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Vendored CDN libs. Pinned versions for cache stability. -->
+  <!-- Paper.js: SVG parsing + bezier/arc flattening. We only use core path APIs. -->
+  <script src="https://cdn.jsdelivr.net/npm/paper@0.12.17/dist/paper-core.min.js" defer></script>
+  <!-- ImageTracer.js: raster -> SVG path data. -->
+  <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Pen Plotter</h1>
+    <div id="connState" class="pill off">Disconnected</div>
+  </header>
+
+  <section class="row">
+    <button id="btnConnect">Connect</button>
+    <button id="btnDisconnect" disabled>Disconnect</button>
+  </section>
+
+  <section>
+    <label class="block">
+      <span>Image (.svg, .png, .jpg)</span>
+      <input id="fileInput" type="file" accept=".svg,image/svg+xml,image/png,image/jpeg" />
+    </label>
+  </section>
+
+  <section class="grid2">
+    <figure>
+      <figcaption>Source</figcaption>
+      <canvas id="srcCanvas" width="320" height="320"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Toolpath preview</figcaption>
+      <canvas id="pathCanvas" width="320" height="320"></canvas>
+    </figure>
+  </section>
+
+  <details open>
+    <summary>Settings</summary>
+    <div class="grid2">
+      <label>Paper
+        <select id="paperSize">
+          <option value="A4">A4 (210 × 297)</option>
+          <option value="A5">A5 (148 × 210)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      <label>Margin (mm)
+        <input id="margin" type="number" value="10" min="0" step="1" />
+      </label>
+      <label>Paper W (mm)
+        <input id="paperW" type="number" value="210" min="10" step="1" />
+      </label>
+      <label>Paper H (mm)
+        <input id="paperH" type="number" value="297" min="10" step="1" />
+      </label>
+
+      <label>Fit mode
+        <select id="fitMode">
+          <option value="fit">Fit to paper</option>
+          <option value="explicit">Explicit W × H</option>
+        </select>
+      </label>
+      <label>&nbsp;
+        <span class="hint">(used in explicit mode)</span>
+      </label>
+      <label>Output W (mm)
+        <input id="outW" type="number" value="180" min="1" step="1" />
+      </label>
+      <label>Output H (mm)
+        <input id="outH" type="number" value="260" min="1" step="1" />
+      </label>
+
+      <label>Feed rate (mm/min)
+        <input id="feed" type="number" value="1500" min="1" step="50" />
+      </label>
+      <label>Flatten tolerance (mm)
+        <input id="tolerance" type="number" value="0.1" min="0.01" step="0.01" />
+      </label>
+
+      <label>Pen-up command
+        <input id="penUp" type="text" value="M3 S100" />
+      </label>
+      <label>Pen-down command
+        <input id="penDown" type="text" value="M3 S600" />
+      </label>
+
+      <label>Tracer threshold (raster)
+        <input id="trThresh" type="number" value="128" min="0" max="255" step="1" />
+      </label>
+      <label>Tracer smoothing (ltres)
+        <input id="trSmooth" type="number" value="1" min="0" step="0.1" />
+      </label>
+      <label>Min path length (mm)
+        <input id="minPath" type="number" value="1" min="0" step="0.1" />
+      </label>
+    </div>
+  </details>
+
+  <section class="row">
+    <button id="btnGenerate" disabled>Generate G-code</button>
+    <button id="btnSend" disabled>Send</button>
+    <button id="btnPause" disabled>Pause</button>
+    <button id="btnResume" disabled>Resume</button>
+    <button id="btnStop" disabled>Stop</button>
+  </section>
+
+  <section id="statusRow" class="status">
+    <div><b>Grbl:</b> <span id="grblState">—</span></div>
+    <div><b>MPos:</b> <span id="mpos">—</span></div>
+    <div><b>Lines:</b> <span id="lineCounter">0 / 0</span></div>
+    <div><b>Current:</b> <code id="currentLine">—</code></div>
+  </section>
+
+  <details>
+    <summary>G-code</summary>
+    <textarea id="gcodeOut" rows="12" readonly placeholder="(generate to populate)"></textarea>
+  </details>
+
+  <details>
+    <summary>Log</summary>
+    <pre id="log"></pre>
+  </details>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
