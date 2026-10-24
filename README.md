@@ -76,7 +76,7 @@ Push this directory to a repo, enable Pages on `main` / `/` (root). HTTPS is pro
 2. Pick an image. Source preview renders.
 3. Tweak settings (paper, margin, feed, pen-up/down commands, raster threshold/smoothing).
 4. **Generate G-code** — toolpath preview renders; G-code populates the textarea.
-5. Manually park the plotter head at where you want `(0, 0)` on the paper. The header emits `G92 X0 Y0` to set the work zero — there is **no homing** assumed.
+5. Home (`$H`), jog the pen to the paper corner matching the Origin setting, and press **Reset zero** (`G10 L20`). The header emits `G92.1` so any stale `G92` offset cannot override that zero.
 6. **Send** — streaming starts. Pause / Resume / Stop are real-time bytes.
 
 ## Settings reference
@@ -98,7 +98,7 @@ Push this directory to a repo, enable Pages on `main` / `/` (root). HTTPS is pro
 
 - The icons are placeholder solid squares. Replace `icons/icon-192.png` and `icons/icon-512.png` with real artwork before publishing.
 - Stop sends `0x18` (Grbl soft reset) and clears the local queue. After Stop the controller re-initializes; re-zero the head before the next job.
-- The status row reads `MPos` — since we set `G92 X0 Y0` rather than homing, `MPos` and `WPos` will be the same. If your config uses `WPos` instead, the parser falls back to it.
+- The status row reads `MPos` — after homing, `MPos` is machine position and differs from the work position by the zero offset (`WCO`). If your config uses `WPos` instead, the parser falls back to it.
 - Web Bluetooth is Chromium-only. Safari on iOS does not implement it.
 
 ## License

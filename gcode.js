@@ -193,7 +193,7 @@ export function emitGcode(polys, opts) {
   out.push('; pen-plotter-pwa generated');
   out.push('G21');                  // mm
   out.push('G90');                  // absolute
-  out.push('G92 X0 Y0');           // assume head parked at origin
+  out.push('G92.1');                // clear any G92 offset; work zero comes from "Reset zero" (G10 L20)
   out.push(opts.penUp);
 
   for (const poly of polys) {
