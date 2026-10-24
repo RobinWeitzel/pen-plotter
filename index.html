@@ -110,10 +110,16 @@
           <input id="penDown" type="text" value="M3 S100" />
         </label>
 
+        <label>Raster tracing
+          <select id="traceMode">
+            <option value="centerline">Centerline (handwriting, line art)</option>
+            <option value="outline">Outline (filled shapes)</option>
+          </select>
+        </label>
         <label>Tracer threshold (raster)
           <input id="trThresh" type="number" value="128" min="0" max="255" step="1" />
         </label>
-        <label>Tracer smoothing (ltres)
+        <label>Tracer smoothing
           <input id="trSmooth" type="number" value="1" min="0" step="0.1" />
         </label>
         <label>Min path length (mm)

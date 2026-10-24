@@ -3,7 +3,7 @@
 // Bump CACHE_VERSION when you ship changes; old caches are cleaned on activate.
 
 // Bump together with APP_VERSION in app.js on each release.
-const CACHE_VERSION = 'pen-plotter-v0.10';
+const CACHE_VERSION = 'pen-plotter-v0.11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './app.js',
   './ble.js',
   './gcode.js',
+  './centerline.js',
   './ui.js',
   './manifest.json',
   './icons/icon-192.png',

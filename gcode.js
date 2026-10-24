@@ -2,13 +2,16 @@
 //
 // Responsibilities:
 //   1. SVG string -> array of polylines (mm), via Paper.js for path flattening.
-//   2. Raster (HTMLImageElement / canvas) -> SVG via ImageTracer, then route 1.
+//   2. Raster -> polylines: centerline (single strokes, see centerline.js) or
+//      outline (SVG via ImageTracer, then route 1).
 //   3. Transform polylines to fit paper with margin (or explicit W×H).
 //   4. Greedy nearest-neighbor reorder to minimize pen-up travel.
 //   5. Emit Grbl G-code with configurable pen-up / pen-down / feed.
 //
 // Polyline = [[x0,y0],[x1,y1],...]  in millimeters, paper coordinate system
 // (origin bottom-left after final transform).
+
+import { centerlinePolylines } from './centerline.js';
 
 // ----------------------------------------------------------------------------
 // SVG -> polylines using Paper.js (paper-core, no DOM canvas needed for this).
@@ -67,9 +70,17 @@ function pathToPolyline(path, tolerance) {
 }
 
 // ----------------------------------------------------------------------------
-// Raster -> SVG via ImageTracer, then SVG -> polylines.
+// Raster -> polylines. 'centerline' draws each stroke once along its middle
+// (handwriting, line art); 'outline' traces the edge of every inked region via
+// ImageTracer (filled shapes, logos).
 
 export function rasterToPolylines(imageData, opts) {
+  if (opts.mode !== 'outline') {
+    return centerlinePolylines(imageData, {
+      threshold: opts.threshold ?? 128,
+      smoothing: opts.smoothing ?? 1,
+    });
+  }
   if (typeof ImageTracer === 'undefined') throw new Error('ImageTracer not loaded');
   const tracerOpts = {
     ltres: opts.smoothing ?? 1,

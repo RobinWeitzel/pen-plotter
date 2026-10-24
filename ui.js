@@ -59,6 +59,7 @@ export class UI {
       penDown: $('penDown').value.trim(),
       origin: $('origin').value,
       align: $('align').value,
+      traceMode: $('traceMode').value,
       threshold: +$('trThresh').value,
       smoothing: +$('trSmooth').value,
       minPathLength: +$('minPath').value,
@@ -244,8 +245,11 @@ export class UI {
       if (this.sourceImage.svg) {
         ({ polylines: polys, bounds } = svgToPolylines(this.sourceImage.svg, opts.tolerance));
       } else {
-        const imgData = imageToImageData(this.sourceImage);
+        // Centerline needs more pixels so small loops (a, e, o) don't fill in.
+        const maxPx = opts.traceMode === 'outline' ? 800 : 1600;
+        const imgData = imageToImageData(this.sourceImage, maxPx);
         ({ polylines: polys, bounds } = rasterToPolylines(imgData, {
+          mode: opts.traceMode,
           threshold: opts.threshold,
           smoothing: opts.smoothing,
           minPathLength: opts.minPathLength,
@@ -343,11 +347,10 @@ function fitDraw(ctx, cw, ch, iw, ih, draw) {
   draw(x, y, w, h);
 }
 
-function imageToImageData(img) {
+function imageToImageData(img, maxPx = 800) {
   const c = document.createElement('canvas');
   // Cap raster size to keep tracing snappy on phones.
-  const MAX = 800;
-  const s = Math.min(1, MAX / Math.max(img.width, img.height));
+  const s = Math.min(1, maxPx / Math.max(img.width, img.height));
   c.width = Math.max(1, Math.round(img.width * s));
   c.height = Math.max(1, Math.round(img.height * s));
   const ctx = c.getContext('2d');
